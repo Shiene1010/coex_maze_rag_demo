@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>코엑스·파르나스 실내 길라잡이 AI — 3단 관제 데모</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- [영역 A] 상단 글로벌 헤더 바 -->
+    <header class="top-header">
+      <div class="session-tabs">
+        <button id="tab-mak" class="tab-btn">🔄 막해일: 멀티버스 루프</button>
+        <button id="tab-park" class="tab-btn active">✨ 박해일: 전이학습 & 트리패치</button>
+      </div>
+
+      <div class="mission-timer">
+        <span class="label">⏱ 도착:</span>
+        <span id="arrival-time" class="time-val success">08:53</span>
+        <span class="deadline">/ 마감 09:00</span>
+        <span id="status-badge" class="badge success">7분 전 여유</span>
+      </div>
+
+      <div class="reward-board">
+        <span class="label">🏆 리워드:</span>
+        <span id="reward-score" class="score-val">+1,050점</span>
+        <div class="progress-bar">
+          <div id="reward-fill" class="progress-fill" style="width: 100%;"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 메인 3단 그리드 영역 -->
+    <main class="main-grid">
+      <!-- [영역 B] 좌측 패널: 메신저 & NPC 선택 -->
+      <section class="panel left-panel">
+        <div class="panel-header">
+          <span class="title">🎩 웨스틴 수석 컨시어지</span>
+          <span class="tag-rag">Self-Refining RAG</span>
+        </div>
+
+        <div id="chat-timeline" class="chat-timeline">
+          <!-- JS로 턴별 말풍선 동적 렌더링 -->
+        </div>
+
+        <div class="npc-section">
+          <div class="npc-title">현장 조언자 멀티버스 비교 (클릭하여 시뮬레이션)</div>
+          <div class="npc-grid">
+            <button class="npc-card fail" data-npc="cleaner">
+              <div class="npc-name">🧹 청소부 (수직편향)</div>
+              <div class="npc-meta">09:03 지각 · 학습됨 ✓</div>
+            </button>
+            <button class="npc-card fail" data-npc="guard">
+              <div class="npc-name">💂 현관 수위 (실외편향)</div>
+              <div class="npc-meta">09:06 지각 · 학습됨 ✓</div>
+            </button>
+            <button class="npc-card fail" data-npc="runner">
+              <div class="npc-name">🏃 급한 행인 (일반LLM)</div>
+              <div class="npc-meta">09:12 실패 · 학습됨 ✓</div>
+            </button>
+            <button class="npc-card best active" data-npc="concierge">
+              <div class="npc-name">🎩 수석 컨시어지</div>
+              <div class="npc-meta">08:53 도착 · 최적해 ★</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="control-bar">
+          <button id="btn-next" class="btn-primary">▶ 다음 턴 진행 (Space)</button>
+          <button id="btn-reset" class="btn-secondary">⏪ 초기화</button>
+        </div>
+      </section>
+
+      <!-- [영역 C] 중앙 패널: IMDF 3계층 사각 그리드 맵 -->
+      <section class="panel center-panel">
+        <div class="panel-header">
+          <span class="title">🗺️ IMDF 3계층 사각 그리드 궤적 맵 (5m×5m)</span>
+        </div>
+        <div class="map-legend">
+          <span><i class="dot green"></i> B1 평면 실내 (채택)</span>
+          <span><i class="dot red"></i> 수직·실외 이탈 (차단)</span>
+          <span class="tree-warn">🎄 실시간 트리 병목</span>
+        </div>
+
+        <div class="layers-container">
+          <!-- Layer 1: OUT -->
+          <div class="layer-box out-layer">
+            <div class="layer-title">[OUT] 지상 / 야외 영동대로 (실외 전환 페널티 +500)</div>
+            <div class="layer-nodes">
+              <div id="node-out-6" class="map-node warn-node">삼성역 6번 출구<br><small>🚫 야외 이탈</small></div>
+              <div id="node-out-grand" class="map-node trap-node">그랜드 인터컨티넨탈 파르나스<br><small>⚠️ 유사 호텔 오인 구역</small></div>
+            </div>
+          </div>
+
+          <!-- Layer 2: 1F -->
+          <div class="layer-box f1-layer">
+            <div class="layer-title">[1F] 지상 1층 홀 및 로비 (중간 수직 이동 페널티 +300)</div>
+            <div class="layer-nodes">
+              <div id="node-1f-wall" class="map-node block-node">코엑스·타워 1층 단절 구간<br><small>벽면 막힘 (재하강 유발)</small></div>
+              <div id="node-1f-goal" class="map-node goal-node">🏁 웨스틴 1F<br><small>수속 데스크 도착</small></div>
+            </div>
+          </div>
+
+          <!-- Layer 3: B1 -->
+          <div class="layer-box b1-layer">
+            <div class="layer-title">[B1] 지하 1층 실내 평면 연결축 (무수직·무실외 골든 패스)</div>
+            <div class="b1-track">
+              <div id="node-b1-start" class="track-step active">🚶 스벅 모서리<br><small>N_B1_14_12</small></div>
+              <div class="track-arrow">➔</div>
+              <div id="node-b1-tree" class="track-step bypass">🎄 트리 좌측 우회<br><small>병목 회피</small></div>
+              <div class="track-arrow">➔</div>
+              <div id="node-b1-mall" class="track-step">천장 낮은 몰 복도<br><small>그랜드 직진 통과</small></div>
+              <div class="track-arrow">➔</div>
+              <div id="node-b1-esc" class="track-step">전용 에스컬레이터<br><small>N_B1_30_12</small></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="map-footer">
+          <span id="route-summary">📏 총 16그리드 (80m) · 실내 연속성 100%</span>
+          <span class="turn-indicator">진행 단계: <strong id="turn-count">1 / 3</strong></span>
+        </div>
+      </section>
+
+      <!-- [영역 D] 우측 패널: RAG & 리워딩 X-Ray 관제 로그 -->
+      <section class="panel right-panel">
+        <div class="panel-header">
+          <span class="title">🧠 RAG & 리워딩 X-Ray 관제 로그</span>
+        </div>
+
+        <div class="node-status-box">
+          <div class="node-id">📍 확정 노드: <span id="current-node-id">N_B1_14_12</span></div>
+          <div class="node-alias" id="current-node-alias">별칭: "높은 책장 끝나는 스벅 모서리"</div>
+          <div class="check-pills">
+            <span class="pill">✓ 단서역추적</span>
+            <span class="pill">✓ 상대방향</span>
+            <span class="pill">✓ 함정경고</span>
+            <span class="pill">✓ 일정관리</span>
+          </div>
+        </div>
+
+        <div class="log-section">
+          <div class="sub-title">⚡ 실시간 리워딩 & 엣지 필터링 로그</div>
+          <pre id="xray-logs" class="terminal-log"></pre>
+        </div>
+
+        <div class="db-section">
+          <div class="sub-title">🧬 자가 진화 지식 베이스 (Learned & Live DB)</div>
+          <div class="db-card live">
+            <div class="db-head">🎄 [LIVE PATCH] 2026-11-15 중앙 대형 트리</div>
+            <p>• 상태: 중앙 시야 차단 및 사진 인파 병목 발생</p>
+            <p class="highlight">• 검증 후기(★5.0): 좌측 벽면 상가 라인 우회 시 5분 주파</p>
+          </div>
+          <div class="db-card transfer">
+            <div class="db-head">💡 [전이 학습] 파르나스 2개 건물군 이원화 경고</div>
+            <p>• 학습 원인: Universe 02(현관 수위) 그랜드 오인 실패</p>
+            <p>• 조치: 파르나스몰 막다른 끝단까지 무정차 직진 지시</p>
+          </div>
+          <div class="db-card block">
+            <div class="db-head">🚫 [HARD BLOCK] 중간 에스컬레이터 상승 금지</div>
+            <p>• 학습 원인: Universe 01(청소부) 1F 단절 구간 지각</p>
+            <p>• 조치: 전용 허브(N_B1_30_12) 외 중간 상승 차단</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
